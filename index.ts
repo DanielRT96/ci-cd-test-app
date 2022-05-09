@@ -3,7 +3,7 @@ const app = express()
 const port = process.env.PORT || 8000
 
 app.get('/', (req, res) => {
-  res.send('This was deployed by CircleCI')
+  res.send('This was deployed by CircleCI!')
 })
 
 app.listen(port, () => {
