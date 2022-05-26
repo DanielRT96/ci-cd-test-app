@@ -23,7 +23,7 @@ aliases:
 
 orbs:
   node: circleci/node@2.0.3
-  heroku: circleci/heroku@1.2.6
+  # heroku: circleci/heroku@1.2.6
 
 jobs:
   lint:
@@ -58,21 +58,15 @@ jobs:
       - run: npm run build
   deploy:
     docker:
-      - image: cimg/node:14.17.4
+      - image: cimg/python:3.7.4
     working_directory: ~/repo
     environment:
-      HEROKU_APP: 'guarded-escarpment-80478'
+      HEROKU_APP_NAME: 'guarded-escarpment-80478'
     steps:
       - checkout
       - run:
           name: Setup Heroku
           command: bash .circleci/setup-heroku.sh
-
-      - run:
-          command: |
-            git push heroku guarded-escarpment-80478:push
-            sleep 5
-            heroku restart
 
 workflows:
   lint-test:
