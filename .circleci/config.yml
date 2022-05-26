@@ -23,7 +23,7 @@ aliases:
 
 orbs:
   node: circleci/node@2.0.3
-  heroku: circleci/heroku@1.2.6
+  # heroku: circleci/heroku@1.2.6
 
 jobs:
   lint:
@@ -56,24 +56,24 @@ jobs:
       - *npm-install
       - *save-cache
       - run: npm run build
-  deploy:
-    working_directory: ~/repo
-    environment:
-      HEROKU_APP: 'guarded-escarpment-80478'
-    steps:
-      - checkout
-      - run:
-          name: Setup Heroku
-          command: bash .circleci/setup-heroku.sh
+  # deploy:
+  #   working_directory: ~/repo
+  #   environment:
+  #     HEROKU_APP: 'guarded-escarpment-80478'
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Setup Heroku
+  #         command: bash .circleci/setup-heroku.sh
 
-      - run:
-          command: |
-            git push heroku sequential-branch-filter:master
-            sleep 5 
-            heroku restart
+  #     - run:
+  #         command: |
+  #           git push heroku sequential-branch-filter:master
+  #           sleep 5
+  #           heroku restart
 
 workflows:
-  verison: 2.1
+  verison: 2.1,
   lint-test:
     jobs:
       - lint
