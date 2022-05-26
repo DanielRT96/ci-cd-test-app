@@ -79,7 +79,12 @@ workflows:
       - test
   build-deploy:
     jobs:
-      - build
+      - lint
+      - test
+      - build:
+          requires:
+            - lint
+            - test
       - heroku/deploy-via-git:
           requires:
             - build
