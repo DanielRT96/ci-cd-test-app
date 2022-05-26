@@ -1,38 +1,85 @@
 version: 2.1
 
+aliases:
+  - &restore-cache
+    restore_cache:
+      key: npm-{{ checksum "package.json" }}
+
+  - &npm-install
+    run:
+      name: Install test dependencies
+      command: npm install
+
+  - &save-cache
+    save_cache:
+      key: npm-{{ checksum "package.json" }}
+      paths:
+        - ~/repo/node_modules
+
+  - &filter-main
+    branches:
+      only:
+        - main
+
 orbs:
   node: circleci/node@2.0.3
   heroku: circleci/heroku@1.2.6
 
 jobs:
-  build_and_test:
-    executor:
-      name: node/default
+  lint:
+    docker:
+      - image: cimg/node:14.17.4
+    working_directory: ~/repo
     steps:
       - checkout
-      - restore_cache:
-          key: v1-deps-{{ checksum "package-lock.json" }}
+      - *restore-cache
+      - *npm-install
+      - *save-cache
+      - run: npm run lint
+  test:
+    docker:
+      - image: cimg/node:14.17.4
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - *restore-cache
+      - *npm-install
+      - *save-cache
+      - run: npm run test
+  build:
+    docker:
+      - image: cimg/node:14.17.4
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - *restore-cache
+      - *npm-install
+      - *save-cache
+      - run: npm run build
+  deploy:
+    working_directory: ~/repo
+    environment:
+      HEROKU_APP: 'guarded-escarpment-80478'
+    steps:
+      - checkout
       - run:
-          name: install dependencies
-          command: npm install
-      - save_cache:
-          key: v1-deps-{{ checksum "package-lock.json" }}
-          paths:
-            - node_modules
+          name: Setup Heroku
+          command: bash .circleci/setup-heroku.sh
+
       - run:
-          name: Lint
-          command: npm run lint
-      - run:
-          name: Run tests
-          command: npm run test
-      - run:
-          name: Run build
-          command: npm run build
+          command: |
+            git push heroku sequential-branch-filter:master
+            sleep 5 
+            heroku restart
 
 workflows:
-  run-ci:
+  verison: 2.1
+  lint-test:
     jobs:
-      - build_and_test
-      - heroku/deploy-via-git:
-          requires:
-            - build_and_test
+      - lint
+      - test
+  build-deploy:
+    - heroku/deploy-via-git:
+        requires:
+          - build
+        filters: *filter-main
