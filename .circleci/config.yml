@@ -57,6 +57,8 @@ jobs:
       - *save-cache
       - run: npm run build
   deploy:
+    docker:
+      - image: cimg/node:14.17.4
     working_directory: ~/repo
     environment:
       HEROKU_APP: 'guarded-escarpment-80478'
@@ -68,7 +70,7 @@ jobs:
 
       - run:
           command: |
-            git push heroku sequential-branch-filter:master
+            git push heroku guarded-escarpment-80478:push
             sleep 5
             heroku restart
 
@@ -85,7 +87,7 @@ workflows:
           requires:
             - lint
             - test
-      - heroku/deploy-via-git:
+      - deploy:
           requires:
             - build
           filters: *filter-main
