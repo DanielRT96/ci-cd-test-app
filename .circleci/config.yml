@@ -23,12 +23,11 @@ aliases:
 
 orbs:
   node: circleci/node@2.0.3
-  # heroku: circleci/heroku@1.2.6
 
 jobs:
   lint:
     docker:
-      - image: cimg/node:14.17.4
+      - image: cimg/node:18.2.0
     working_directory: ~/repo
     steps:
       - checkout
@@ -38,7 +37,7 @@ jobs:
       - run: npm run lint
   test:
     docker:
-      - image: cimg/node:14.17.4
+      - image: cimg/node:18.2.0
     working_directory: ~/repo
     steps:
       - checkout
@@ -48,7 +47,7 @@ jobs:
       - run: npm run test
   build:
     docker:
-      - image: cimg/node:14.17.4
+      - image: cimg/node:18.2.0
     working_directory: ~/repo
     steps:
       - checkout
@@ -58,7 +57,7 @@ jobs:
       - run: npm run build
   deploy:
     docker:
-      - image: cimg/python:3.7.4
+      - image: cimg/python:3.10.4
     working_directory: ~/repo
     environment:
       HEROKU_APP_NAME: 'guarded-escarpment-80478'
@@ -77,7 +76,10 @@ workflows:
   lint-test:
     jobs:
       - lint
-      - test
+      - test:
+          filters:
+            branches:
+              ignore: main
   build-deploy:
     jobs:
       - lint
