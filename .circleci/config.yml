@@ -16,9 +16,14 @@ aliases:
       paths:
         - ~/repo/node_modules
 
-  - &filter-main
+  - &only-main
     branches:
       only:
+        - main
+
+  - &ignore-main
+    branches:
+      ignore:
         - main
 
 orbs:
@@ -73,22 +78,30 @@ jobs:
             git push heroku main
 
 workflows:
-  lint-test:
+  lint-test-build:
     jobs:
-      - lint
+      - lint:
+          filters: *ignore-main
       - test:
-          filters:
-            branches:
-              ignore: main
-  build-deploy:
-    jobs:
-      - lint
-      - test
+          filters: *ignore-main
       - build:
           requires:
             - lint
             - test
+          filters: *ignore-main
+
+  deploy-dev:
+    jobs:
+      - lint:
+          filters: *only-main
+      - test:
+          filters: *only-main
+      - build:
+          requires:
+            - lint
+            - test
+          filters: *only-main
       - deploy:
           requires:
             - build
-          filters: *filter-main
+          filters: *only-main
