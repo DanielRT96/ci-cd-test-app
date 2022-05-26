@@ -23,7 +23,7 @@ aliases:
 
 orbs:
   node: circleci/node@2.0.3
-  # heroku: circleci/heroku@1.2.6
+  heroku: circleci/heroku@1.2.6
 
 jobs:
   lint:
@@ -77,11 +77,11 @@ workflows:
     jobs:
       - lint
       - test
-  # build-deploy:
-  #   - heroku/deploy-via-git:
-  #       requires:
-  #         - build
-  #         filters:
-  #             branches:
-  #               only:
-  #                 - main
+  build-deploy:
+    - heroku/deploy-via-git:
+        requires:
+          - build
+          filters:
+              branches:
+                only:
+                  - main
