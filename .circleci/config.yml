@@ -73,7 +73,6 @@ jobs:
   #           heroku restart
 
 workflows:
-  verison: 2.1,
   lint-test:
     jobs:
       - lint
