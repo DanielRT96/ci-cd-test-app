@@ -77,29 +77,29 @@ jobs:
           command: |
             git push heroku main
 
-  eb-deploy-manual:
-    docker:
-      - image: cimg/python:3.10.4
-    parameters:
-      environment-name:
-        default: ''
-        description: The name of the application (used during `eb init`).
-        type: string
-    steps:
-      - checkout
-      - run:
-          working_directory: ~/repo
-          command: |
-            mkdir ~/.aws
-            touch ~/.aws/config
-            chmod 600 ~/.aws/config
-            echo "[profile default]" > ~/.aws/config
-            echo "aws_access_key_id=${AWS_ACCESS_KEY_ID}" >> ~/.aws/config
-            echo "aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}" >> ~/.aws/config
-            curl -O https://bootstrap.pypa.io/get-pip.py
-            pip install awsebcli --upgrade --user
-            eb init <<parameters.environment-name>> -r ${AWS_DEFAULT_REGION}
-            eb deploy <<parameters.environment-name>> -l <<parameters.label>>
+  # eb-deploy-manual:
+  #   docker:
+  #     - image: cimg/python:3.10.4
+  #   parameters:
+  #     environment-name:
+  #       default: ''
+  #       description: The name of the application (used during `eb init`).
+  #       type: string
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         working_directory: ~/repo
+  #         command: |
+  #           mkdir ~/.aws
+  #           touch ~/.aws/config
+  #           chmod 600 ~/.aws/config
+  #           echo "[profile default]" > ~/.aws/config
+  #           echo "aws_access_key_id=${AWS_ACCESS_KEY_ID}" >> ~/.aws/config
+  #           echo "aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}" >> ~/.aws/config
+  #           curl -O https://bootstrap.pypa.io/get-pip.py
+  #           pip install awsebcli --upgrade --user
+  #           eb init <<parameters.environment-name>> -r ${AWS_DEFAULT_REGION}
+  #           eb deploy <<parameters.environment-name>> -l <<parameters.label>>
 
 workflows:
   lint-test-build:
@@ -130,21 +130,21 @@ workflows:
             - build
           filters: *only-main
 
-  deploy-dev-aws:
-    jobs:
-      - lint:
-          filters: *only-main
-      - test:
-          filters: *only-main
-      - build:
-          requires:
-            - lint
-            - test
-          filters: *only-main
-      - eb/deploy:
-          context: aws-creds
-          application-name: test-app-dev
-          environment-name: test-app-dev
-          requires:
-            - build
-          filters: *only-main
+  # deploy-dev-aws:
+  #   jobs:
+  #     - lint:
+  #         filters: *only-main
+  #     - test:
+  #         filters: *only-main
+  #     - build:
+  #         requires:
+  #           - lint
+  #           - test
+  #         filters: *only-main
+  #     - eb/deploy:
+  #         context: aws-creds
+  #         application-name: test-app-dev
+  #         environment-name: test-app-dev
+  #         requires:
+  #           - build
+  #         filters: *only-main
