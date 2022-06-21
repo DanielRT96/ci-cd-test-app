@@ -132,7 +132,7 @@ workflows:
             - test
           filters: *only-main
       - deploy-aws:
-          context: aws-creds
+          context: aws-cred
           requires:
             - build
           filters: *only-main
