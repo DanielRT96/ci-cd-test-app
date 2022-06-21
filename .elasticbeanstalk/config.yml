@@ -2,7 +2,7 @@ branch-defaults:
   main:
     environment: Testapp-env-$CIRCLECI_BRANCH
 global:
-  application_name: test-app
+  application_name: Testapp-env
   default_platform: 64bit Amazon Linux 2/3.4.16
   default_region: eu-central-1
   sc: git
