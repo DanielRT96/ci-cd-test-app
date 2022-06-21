@@ -60,7 +60,7 @@ jobs:
       - *npm-install
       - *save-cache
       - run: npm run build
-  deploy:
+  deploy-heroku:
     docker:
       - image: cimg/python:3.10.4
     working_directory: ~/repo
@@ -76,6 +76,20 @@ jobs:
           name: Push to Heroku
           command: |
             git push heroku main
+  deploy-aws:
+    docker:
+      - image: cimg/python:3.10
+    steps:
+      - checkout
+      - run: pip3 --version
+      - run:
+          working_directory: ~/repo
+          name: installing ebcli
+          command: pip3 install awsebcli --upgrade --user
+      - run: eb --version
+      - run:
+          name: deploying with awsebcli
+          command: eb deploy  test-app-$CIRCLE_BRANCH
 
 workflows:
   lint-test-build:
@@ -90,7 +104,7 @@ workflows:
             - test
           filters: *ignore-main
 
-  deploy-dev:
+  deploy-heroku:
     jobs:
       - lint:
           filters: *only-main
@@ -101,7 +115,24 @@ workflows:
             - lint
             - test
           filters: *only-main
-      - deploy:
+      - deploy-heroku:
+          requires:
+            - build
+          filters: *only-main
+
+  deploy-aws:
+    jobs:
+      - lint:
+          filters: *only-main
+      - test:
+          filters: *only-main
+      - build:
+          requires:
+            - lint
+            - test
+          filters: *only-main
+      - deploy-aws:
+          context: aws-creds
           requires:
             - build
           filters: *only-main
