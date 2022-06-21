@@ -89,7 +89,7 @@ jobs:
       - run: eb --version
       - run:
           name: deploying with awsebcli
-          command: eb deploy  test-app-$CIRCLE_BRANCH
+          command: eb deploy Testapp-env-$CIRCLE_BRANCH
 
 workflows:
   lint-test-build:
